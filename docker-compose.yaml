@@ -30,5 +30,24 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # 내부망(PLAINTEXT)과 외부망(CONNECTIONS_FROM_HOST)을 철저히 분리
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,CONNECTIONS_FROM_HOST://localhost:9092
+      # 브로커가 컨트롤러와 통신할 때 내부망 주소(kafka)를 쓰도록 강제
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  spark:
+    image: apache/spark:3.5.0
+    container_name: skywatcher-spark
+    environment:
+      - SPARK_MODE=master
+    user: root
+    # tty: true
+    command: >
+          /opt/spark/bin/spark-submit 
+          --master local[*]
+          --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0
+          /opt/spark/work-dir/streaming/debug.py
+    volumes:
+      - ./streaming:/opt/spark/work-dir/streaming
