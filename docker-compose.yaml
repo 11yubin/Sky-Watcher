@@ -12,7 +12,8 @@ services:
       - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: skywatcher-zookeeper
@@ -44,10 +45,11 @@ services:
       - SPARK_MODE=master
     user: root
     # tty: true
+    # jdbc 연결 코드 추가
     command: >
-          /opt/spark/bin/spark-submit 
-          --master local[*]
-          --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0
-          /opt/spark/work-dir/streaming/debug.py
+      /opt/spark/bin/spark-submit
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.6.0
+      --master local[*]
+      /opt/spark/work-dir/streaming/main.py
     volumes:
       - ./streaming:/opt/spark/work-dir/streaming

@@ -18,12 +18,12 @@ url = "https://opensky-network.org/api"
 uri = "/states/all"
 
 ## 한국 위경도 - test용!!
-params = {
-    "lamin": 33.00,  # 위도 최소값 (제주도 남단 아래)
-    "lomin": 124.00, # 경도 최소값 (서해안 서쪽)
-    "lamax": 38.61,  # 위도 최대값 (휴전선 북쪽)
-    "lomax": 132.00  # 경도 최대값 (독도 동쪽)
-}
+# params = {
+#     "lamin": 33.00,  # 위도 최소값 (제주도 남단 아래)
+#     "lomin": 124.00, # 경도 최소값 (서해안 서쪽)
+#     "lamax": 38.61,  # 위도 최대값 (휴전선 북쪽)
+#     "lomax": 132.00  # 경도 최대값 (독도 동쪽)
+# }
 
 # 콜백 함수
 def delivery_report(err, msg):
@@ -37,7 +37,7 @@ def delivery_report(err, msg):
 # produce 함수
 def produce():
     try:
-        response = requests.get(url + uri, params=params)
+        response = requests.get(url + uri)
         data = response.json()
 
         current_time = data.get('time')
@@ -54,8 +54,8 @@ def produce():
                 "icao24": icao24,
                 "callsign": flight[1].strip(),
                 "country": flight[2],
-                "langitude": flight[5],
-                "longitude": flight[6],
+                "longitude": flight[5],
+                "latitude": flight[6],
                 "altitude": flight[7],
                 "velocity": flight[9]
             }
