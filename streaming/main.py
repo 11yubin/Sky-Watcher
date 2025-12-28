@@ -84,12 +84,12 @@ def write_to_postgres(batch_df, batch_id):
     active_df = batch_df.select("icao24", "callsign", "lat", "lon", "velocity", "altitude", "airline", "updated_at")
     active_df.write \
         .format("jdbc") \
-        .option("url", "jdbc:postgresql://postgres:5432/skydb") \
+        .option("url", "jdbc:postgresql://postgres:5432/skywatcher") \
         .option("dbtable", "active_flights") \
-        .option("user", "skyuser") \
-        .option("password", "skypass") \
+        .option("user", "admin") \
+        .option("password", "password") \
         .option("driver", "org.postgresql.Driver") \
-        .mode("upsert") \
+        .mode("append") \
         .save()
 
 # 스트리밍 시작
