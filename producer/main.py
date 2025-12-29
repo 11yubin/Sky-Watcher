@@ -31,8 +31,8 @@ def delivery_report(err, msg):
         print(f'❌ 전송 실패: {err}')
     else:
         # 너무 많이 찍히면 정신 없으니까 10개 중 1개만 로그 찍거나, 아예 주석 처리 - 초반에는 확인용으로
-        print(f'성공!')
-        # pass
+        # print(f'성공!')
+        pass
 
 # produce 함수
 def produce():
