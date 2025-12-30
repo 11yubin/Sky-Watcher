@@ -124,3 +124,16 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - /var/run/docker.sock:/var/run/docker.sock
+
+  # kafka producer
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: skywatcher-producer
+    restart: on-failure       # Kafka가 아직 안 켜졌으면 죽었다가 다시 살아나게 함
+    depends_on:
+      - kafka
+    volumes:
+      - ./producer:/app/producer
+      - ./pyproject.toml:/app/pyproject.toml
