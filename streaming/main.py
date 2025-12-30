@@ -61,6 +61,7 @@ def map_airline_code(callsign):
         # --- 🇰🇷 대한민국 (국적기 & LCC & 화물) ---
         'KAL': 'Korean Air',          # 대한항공
         'AAR': 'Asiana Airlines',     # 아시아나항공
+        'APZ': 'Air Premia',
         'JJA': 'Jeju Air',            # 제주항공
         'JNA': 'Jin Air',             # 진에어
         'TWB': 'T\'way Air',          # 티웨이항공

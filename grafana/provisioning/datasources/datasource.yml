@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL
+    type: postgres
+    uid: skywatcher-db
+    url: postgres:5432
+    database: skywatcher
+    user: admin
+    secureJsonData:
+      password: password
+    jsonData:
+      sslmode: "disable"
+      postgresVersion: 1500 # 버전 15
+      timescaledb: false
+    isDefault: true # 이걸 기본 DB로 설정

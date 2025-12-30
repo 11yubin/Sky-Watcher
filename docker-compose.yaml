@@ -64,3 +64,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - postgres
+    # 대시보드 생성 자동화 (프로비저닝 파일 경로 연결)
+    volumes:
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      # db연결
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources

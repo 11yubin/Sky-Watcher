@@ -1,0 +1,385 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 0,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "skywatcher-db"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "#6ED0E0",
+                  "value": 50
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 100
+                },
+                {
+                  "color": "#EF843C",
+                  "value": 200
+                },
+                {
+                  "color": "red",
+                  "value": 300
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "basemap": {
+            "config": {},
+            "name": "Layer 0",
+            "noRepeat": false,
+            "type": "default"
+          },
+          "controls": {
+            "mouseWheelZoom": true,
+            "showAttribution": true,
+            "showDebug": false,
+            "showMeasure": false,
+            "showScale": false,
+            "showZoom": true
+          },
+          "layers": [
+            {
+              "config": {
+                "showLegend": true,
+                "style": {
+                  "color": {
+                    "field": "velocity",
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "rotation": {
+                    "fixed": 0,
+                    "max": 360,
+                    "min": -360,
+                    "mode": "mod"
+                  },
+                  "size": {
+                    "fixed": 5,
+                    "max": 15,
+                    "min": 2
+                  },
+                  "symbol": {
+                    "fixed": "img/icons/marker/plane.svg",
+                    "mode": "fixed"
+                  },
+                  "symbolAlign": {
+                    "horizontal": "center",
+                    "vertical": "center"
+                  },
+                  "text": {
+                    "field": "lat",
+                    "fixed": "",
+                    "mode": "fixed"
+                  },
+                  "textConfig": {
+                    "fontSize": 12,
+                    "offsetX": 0,
+                    "offsetY": 0,
+                    "textAlign": "center",
+                    "textBaseline": "middle"
+                  }
+                }
+              },
+              "location": {
+                "latitude": "lat",
+                "longitude": "lon",
+                "mode": "coords"
+              },
+              "name": "velocity",
+              "tooltip": true,
+              "type": "markers"
+            }
+          ],
+          "tooltip": {
+            "mode": "details"
+          },
+          "view": {
+            "allLayers": true,
+            "id": "coords",
+            "lat": 35.169233,
+            "lon": 127.929696,
+            "noRepeat": false,
+            "shared": false,
+            "zoom": 5.49
+          }
+        },
+        "pluginVersion": "12.3.1",
+        "targets": [
+          {
+            "dataset": "skywatcher",
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL",
+            "refId": "A",
+            "sql": {
+              "columns": [
+                {
+                  "parameters": [],
+                  "type": "function"
+                }
+              ],
+              "groupBy": [
+                {
+                  "property": {
+                    "type": "string"
+                  },
+                  "type": "groupBy"
+                }
+              ],
+              "limit": 50
+            }
+          }
+        ],
+        "title": "속도별 geomap",
+        "type": "geomap"
+      },
+      {
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "skywatcher-db"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              }
+            },
+            "mappings": [
+              {
+                "options": {
+                  "Asiana Airlines": {
+                    "color": "dark-red",
+                    "index": 1
+                  },
+                  "Korean Air": {
+                    "color": "dark-blue",
+                    "index": 0
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 30
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "basemap": {
+            "config": {},
+            "name": "Layer 0",
+            "noRepeat": false,
+            "type": "default"
+          },
+          "controls": {
+            "mouseWheelZoom": true,
+            "showAttribution": true,
+            "showDebug": false,
+            "showMeasure": false,
+            "showScale": false,
+            "showZoom": true
+          },
+          "layers": [
+            {
+              "config": {
+                "showLegend": true,
+                "style": {
+                  "color": {
+                    "field": "airline",
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.5,
+                  "rotation": {
+                    "fixed": 0,
+                    "max": 360,
+                    "min": -360,
+                    "mode": "mod"
+                  },
+                  "size": {
+                    "fixed": 5,
+                    "max": 15,
+                    "min": 2
+                  },
+                  "symbol": {
+                    "fixed": "img/icons/marker/circle.svg",
+                    "mode": "fixed"
+                  },
+                  "symbolAlign": {
+                    "horizontal": "center",
+                    "vertical": "center"
+                  },
+                  "textConfig": {
+                    "fontSize": 12,
+                    "offsetX": 0,
+                    "offsetY": 0,
+                    "textAlign": "center",
+                    "textBaseline": "middle"
+                  }
+                }
+              },
+              "location": {
+                "latitude": "lat",
+                "longitude": "lon",
+                "mode": "coords"
+              },
+              "name": "Layer 1",
+              "tooltip": true,
+              "type": "markers"
+            }
+          ],
+          "tooltip": {
+            "mode": "details"
+          },
+          "view": {
+            "allLayers": false,
+            "id": "fit",
+            "lastOnly": false,
+            "lat": 0,
+            "layer": "Layer 1",
+            "lon": 0,
+            "noRepeat": false,
+            "shared": false,
+            "zoom": 15
+          }
+        },
+        "pluginVersion": "12.3.1",
+        "targets": [
+          {
+            "dataset": "skywatcher",
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "skywatcher-db"
+            },
+            "editorMode": "builder",
+            "format": "table",
+            "rawSql": "",
+            "refId": "A"
+          },
+          {
+            "dataset": "skywatcher",
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "skywatcher-db"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "hide": false,
+            "rawQuery": true,
+            "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL",
+            "refId": "B",
+            "sql": {
+              "columns": [
+                {
+                  "parameters": [],
+                  "type": "function"
+                }
+              ],
+              "groupBy": [
+                {
+                  "property": {
+                    "type": "string"
+                  },
+                  "type": "groupBy"
+                }
+              ],
+              "limit": 50
+            }
+          }
+        ],
+        "title": "항공사별 geomap",
+        "type": "geomap"
+      }
+    ],
+    "preload": false,
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "skywatcher",
+    "uid": "skywatcher-db",
+    "version": 7
+  }
