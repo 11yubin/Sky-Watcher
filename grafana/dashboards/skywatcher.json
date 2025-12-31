@@ -175,7 +175,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL",
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND (updated_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul')::date = CURRENT_DATE",
           "refId": "A",
           "sql": {
             "columns": [
@@ -355,7 +355,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL",
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND (updated_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul')::date = CURRENT_DATE",
           "refId": "B",
           "sql": {
             "columns": [
