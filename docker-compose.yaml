@@ -33,7 +33,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       # 내부망(PLAINTEXT)과 외부망(CONNECTIONS_FROM_HOST)을 철저히 분리
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,CONNECTIONS_FROM_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,CONNECTIONS_FROM_HOST://kafka:9092
       # 브로커가 컨트롤러와 통신할 때 내부망 주소(kafka)를 쓰도록 강제
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -41,6 +41,8 @@ services:
   spark:
     image: apache/spark:3.5.0
     container_name: skywatcher-spark
+    depends_on:
+      - producer
     environment:
       - SPARK_MODE=master
     user: root
@@ -110,7 +112,7 @@ services:
     image: apache/airflow:2.7.1
     container_name: airflow-scheduler
     restart: always
-    user: root
+    # user: root
     depends_on:
       - airflow-postgres
     command: scheduler
@@ -137,3 +139,5 @@ services:
     volumes:
       - ./producer:/app/producer
       - ./pyproject.toml:/app/pyproject.toml
+    env_file:
+      - .env

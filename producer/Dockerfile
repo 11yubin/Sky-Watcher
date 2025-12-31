@@ -14,4 +14,4 @@ RUN poetry config virtualenvs.create false \
 
 COPY producer /app/producer
 
-CMD ["poetry", "run", "python", "-u", "producer/main.py"]
+CMD ["python", "-u", "producer/main.py"]

@@ -3,39 +3,16 @@ import requests
 import json
 from confluent_kafka import Producer
 import time
-import os
-
-client_id = os.getenv('OPENSKY_CLIENT_ID')
-client_secret = os.getenv('OPENSKY_CLIENT_SECRET')
-token_url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
-
-token_headers = {
-    "Content-Type": "application/x-www-form-urlencoded"
-}
-
-token_data = {
-    "grant_type": "client_credentials",
-    "client_id": client_id,
-    "client_secret": client_secret
-}
-
-token = requests.post(token_url, headers=token_headers, data=token_data).json().get('access_token')
+from config import settings
 
 # kafka 띄우기
 conf = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': 'kafka:9092',
     'client.id': 'skywatcher-producer'
 }
 
 producer = Producer(conf)
 topic = 'raw_flight_data'
-
-# 실시간 정보 받아오기
-url = "https://opensky-network.org/api"
-uri = "/states/all"
-headers = {
-    "Authorization": f"Bearer {token}"
-}
 
 ## 한국 위경도 - test용!!
 # params = {
@@ -52,9 +29,35 @@ def delivery_report(err, msg):
     else:
         pass
 
+def get_token():
+    client_id = settings.OPENSKY_CLIENT_ID
+    client_secret = settings.OPENSKY_CLIENT_SECRET
+    token_url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+
+    token_headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    token_data = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+
+    token = requests.post(token_url, headers=token_headers, data=token_data).json().get('access_token')
+    return token
+
 # produce 함수
 def produce():
     try:
+        token = get_token()
+        # 실시간 정보 받아오기
+        url = "https://opensky-network.org/api"
+        uri = "/states/all"
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+
         response = requests.get(url + uri, headers=headers)
         data = response.json()
 
