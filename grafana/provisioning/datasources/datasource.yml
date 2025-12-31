@@ -5,11 +5,12 @@ datasources:
     type: postgres
     uid: skywatcher-db
     url: postgres:5432
-    database: skywatcher
     user: admin
     secureJsonData:
       password: password
     jsonData:
+      # db를 여기에 넣어야 인식이 됨!
+      database: skywatcher
       sslmode: "disable"
       postgresVersion: 1500 # 버전 15
       timescaledb: false
