@@ -3,6 +3,23 @@ import requests
 import json
 from confluent_kafka import Producer
 import time
+import os
+
+client_id = os.getenv('OPENSKY_CLIENT_ID')
+client_secret = os.getenv('OPENSKY_CLIENT_SECRET')
+token_url = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+
+token_headers = {
+    "Content-Type": "application/x-www-form-urlencoded"
+}
+
+token_data = {
+    "grant_type": "client_credentials",
+    "client_id": client_id,
+    "client_secret": client_secret
+}
+
+token = requests.post(token_url, headers=token_headers, data=token_data).json().get('access_token')
 
 # kafka 띄우기
 conf = {
@@ -16,6 +33,9 @@ topic = 'raw_flight_data'
 # 실시간 정보 받아오기
 url = "https://opensky-network.org/api"
 uri = "/states/all"
+headers = {
+    "Authorization": f"Bearer {token}"
+}
 
 ## 한국 위경도 - test용!!
 # params = {
@@ -30,14 +50,12 @@ def delivery_report(err, msg):
     if err is not None:
         print(f'❌ 전송 실패: {err}')
     else:
-        # 너무 많이 찍히면 정신 없으니까 10개 중 1개만 로그 찍거나, 아예 주석 처리 - 초반에는 확인용으로
-        # print(f'성공!')
         pass
 
 # produce 함수
 def produce():
     try:
-        response = requests.get(url + uri)
+        response = requests.get(url + uri, headers=headers)
         data = response.json()
 
         current_time = data.get('time')
