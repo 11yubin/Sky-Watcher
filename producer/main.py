@@ -96,7 +96,6 @@ def produce():
         print(f"⚠️ 에러 발생: {e}")
 
 if __name__=="__main__":
-    # 익명 요청이므로 시간 및 횟수 제한 
-    for i in range(10):
+    while True:
         produce()
         time.sleep(15)

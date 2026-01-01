@@ -31,7 +31,7 @@
       },
       "id": 6,
       "panels": [],
-      "title": "Row title",
+      "title": "geomap",
       "type": "row"
     },
     {
@@ -175,7 +175,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND (updated_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul')::date = CURRENT_DATE",
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND $__timeFilter(updated_at - INTERVAL '9 hours')",
           "refId": "A",
           "sql": {
             "columns": [
@@ -196,6 +196,7 @@
           }
         }
       ],
+      "timeFrom": "30m",
       "title": "속도별 geomap",
       "type": "geomap"
     },
@@ -322,14 +323,14 @@
         },
         "view": {
           "allLayers": false,
-          "id": "fit",
+          "id": "coords",
           "lastOnly": false,
-          "lat": 0,
+          "lat": 35.366855,
           "layer": "Layer 1",
-          "lon": 0,
+          "lon": 127.572404,
           "noRepeat": false,
           "shared": false,
-          "zoom": 15
+          "zoom": 5.79
         }
       },
       "pluginVersion": "12.3.1",
@@ -355,7 +356,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND (updated_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul')::date = CURRENT_DATE",
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND $__timeFilter(updated_at - INTERVAL '9 hours')",
           "refId": "B",
           "sql": {
             "columns": [
@@ -376,6 +377,7 @@
           }
         }
       ],
+      "timeFrom": "30m",
       "title": "항공사별 geomap",
       "type": "geomap"
     },
@@ -480,7 +482,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT total_flights FROM daily_stats;",
+          "rawSql": "SELECT summary_date, total_flights FROM daily_stats;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -592,7 +594,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT avg_altitude FROM daily_stats;",
+          "rawSql": "SELECT summary_date, avg_altitude FROM daily_stats;",
           "refId": "A",
           "sql": {
             "columns": [
