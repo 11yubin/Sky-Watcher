@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: skywatcher
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -24,6 +24,8 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: skywatcher-kafka
+    volumes:
+      - ./kafka_data:/kafka
     depends_on:
       - zookeeper
     ports:
@@ -37,6 +39,8 @@ services:
       # 브로커가 컨트롤러와 통신할 때 내부망 주소(kafka)를 쓰도록 강제
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # 토픽 자동 생성 옵션
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
 
   spark:
     image: apache/spark:3.5.0
@@ -77,6 +81,8 @@ services:
   # airflow 전용 db
   airflow-postgres:
     image: postgres:13
+    ports:
+      - "5433:5432"    
     container_name: airflow-postgres
     environment:
       - POSTGRES_USER=airflow

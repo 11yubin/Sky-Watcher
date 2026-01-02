@@ -22,7 +22,6 @@ def calculate_stats():
     """)
 
     # 통계 쿼리 (어제 데이터 요약)
-    # 실제 운영에선 '어제' 날짜를 동적으로 구해야 하지만, 테스트를 위해 전체 데이터를 요약하게 함
     query = """
         INSERT INTO daily_stats (summary_date, total_flights, avg_altitude)
         SELECT 
@@ -30,7 +29,7 @@ def calculate_stats():
             COUNT(*), 
             AVG(altitude)
         FROM flight_logs
-        -- 실제론 여기에 WHERE created_at 조건을 넣어서 어제치만 가져와야 함
+        WHERE created_at::date = CURRENT_DATE - INTERVAL '1 day'
         ON CONFLICT (summary_date) DO UPDATE 
         SET total_flights = EXCLUDED.total_flights, avg_altitude = EXCLUDED.avg_altitude;
     """

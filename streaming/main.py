@@ -70,7 +70,6 @@ def map_airline_code(callsign):
         'ABL': 'Air Busan',           # 에어부산
         'EOK': 'Aero K',              # 에어로케이
         'AIH': 'Air Incheon',         # 에어인천 (화물)
-        'HKE': 'HK Express',          # 홍콩 익스프레스 (한국 취항 많음)
 
         # --- 🇯🇵 일본 ---
         'ANA': 'All Nippon Airways',  # 전일본공수
@@ -91,6 +90,7 @@ def map_airline_code(callsign):
         'HDA': 'Cathay Dragon',       # 캐세이 드래곤
         'CKK': 'China Cargo',
         'AXM': 'Air Asia',
+        'HKE': 'HK Express',          # 홍콩 익스프레스 (한국 취항 많음)
 
         # --- 🇺🇸 미국 & 🇪🇺 유럽 & 🌏 기타 ---
         'DAL': 'Delta Air Lines',     # 델타항공
@@ -125,8 +125,8 @@ airline_udf = udf(map_airline_code, StringType())
 
 # 데이터 가공: 시간 변환 & 항공사 추출 & 컬럼 매핑
 final_stream = korea_flights \
-    .withColumn("updated_at", from_utc_timestamp(from_unixtime(col("timestamp")), "Asia/Seoul")) \
-    .withColumn("created_at", from_utc_timestamp(from_unixtime(col("timestamp")), "Asia/Seoul")) \
+    .withColumn("updated_at", from_unixtime(col("timestamp")).cast("timestamp")) \
+    .withColumn("created_at", from_unixtime(col("timestamp")).cast("timestamp")) \
     .withColumn("airline", airline_udf(col("callsign"))) \
     .withColumnRenamed("baro_altitude", "altitude") \
     .withColumnRenamed("longitude", "lon") \
@@ -158,6 +158,14 @@ def execute_upsert_query(spark_session):
             airline = EXCLUDED.airline;
         """
         stmt.execute(upsert_sql)
+
+        # 오래된 데이터 삭제
+        delete_sql = """
+        DELETE FROM active_flights
+        WHERE updated_at < NOW() - INTERVAL '2 hours';
+        """
+        stmt.execute(delete_sql)
+        
         stmt.close()
         con.close()
     except Exception as e:
@@ -173,7 +181,7 @@ def write_to_postgres(batch_df, batch_id):
 
     # A. flight_logs 테이블에 저장 (Append Mode: 계속 쌓기)
     # 로그용 데이터만 선택 (id는 serial이라 자동 생성되므로 제외)
-    logs_df = batch_df.select("icao24", "lat", "lon", "velocity", "altitude", "airline", "created_at")
+    logs_df = batch_df.select("icao24", "callsign", "lat", "lon", "velocity", "altitude", "airline", "created_at")
     logs_df.write \
         .format("jdbc") \
         .option("url", "jdbc:postgresql://postgres:5432/skywatcher") \
