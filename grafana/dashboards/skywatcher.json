@@ -20,14 +20,162 @@
   "graphTooltip": 0,
   "id": 1,
   "links": [],
+  "liveNow": true,
   "panels": [
     {
-      "collapsed": true,
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "skywatcher-db"
+      },
+      "description": "운항중인 각 항공기들의 궤적",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer 0",
+          "noRepeat": false,
+          "type": "default"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "arrow": 0,
+              "style": {
+                "color": {
+                  "fixed": "dark-green"
+                },
+                "lineWidth": 2,
+                "opacity": 1,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "flight",
+            "tooltip": true,
+            "type": "route"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 35.674874,
+          "lon": 127.540096,
+          "noRepeat": false,
+          "zoom": 6.05
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "skywatcher",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  created_at as \"time\",\n  airline,\n  callsign,\n  icao24,\n  lat,\n  lon,\n  velocity,\n  altitude\n  -- callsign 컬럼은 없으니까 SELECT에서 뺌\nFROM flight_logs\nWHERE\n  $__timeFilter(created_at)\n  AND airline IN (${airline:sqlstring})\n  AND callsign IN (${callsign:sqlstring}) \n  \n  -- 🔥 핵심: callsign 이름으로 검색하는 게 아니라,\n  -- 위에서 선택된 callsign에 해당하는 'icao24' ID로 검색하는 것!\n  -- AND icao24 IN (${icao_id:sqlstring})\n\nORDER BY created_at ASC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "timeFrom": "1h",
+      "title": "flight path (select by airline)",
+      "type": "geomap"
+    },
+    {
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 6,
       "panels": [],
@@ -84,9 +232,10 @@
         "h": 7,
         "w": 11,
         "x": 1,
-        "y": 1
+        "y": 9
       },
       "id": 2,
+      "interval": "15s",
       "options": {
         "basemap": {
           "config": {},
@@ -104,6 +253,13 @@
         },
         "layers": [
           {
+            "config": {},
+            "name": "map",
+            "opacity": 0.3,
+            "tooltip": true,
+            "type": "osm-standard"
+          },
+          {
             "config": {
               "showLegend": true,
               "style": {
@@ -111,7 +267,7 @@
                   "field": "velocity",
                   "fixed": "dark-green"
                 },
-                "opacity": 0.4,
+                "opacity": 0.9,
                 "rotation": {
                   "fixed": 0,
                   "max": 360,
@@ -175,7 +331,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND $__timeFilter(updated_at - INTERVAL '9 hours')",
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND $__timeFilter(updated_at)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -196,7 +352,7 @@
           }
         }
       ],
-      "timeFrom": "30m",
+      "timeFrom": "15m",
       "title": "속도별 geomap",
       "type": "geomap"
     },
@@ -208,7 +364,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "fixed"
           },
           "custom": {
             "hideFrom": {
@@ -220,13 +376,60 @@
           "mappings": [
             {
               "options": {
+                "Aero K": {
+                  "color": "yellow",
+                  "index": 9,
+                  "text": "Korean LCC"
+                },
+                "Air Busan": {
+                  "color": "yellow",
+                  "index": 8,
+                  "text": "Korean LCC"
+                },
+                "Air Incheon": {
+                  "color": "yellow",
+                  "index": 10,
+                  "text": "Korean LCC"
+                },
+                "Air Premia": {
+                  "color": "yellow",
+                  "index": 2,
+                  "text": "Korean LCC"
+                },
+                "Air Seoul": {
+                  "color": "yellow",
+                  "index": 7,
+                  "text": "Korean LCC"
+                },
                 "Asiana Airlines": {
-                  "color": "dark-red",
-                  "index": 1
+                  "color": "dark-blue",
+                  "index": 1,
+                  "text": "Korean FCO"
+                },
+                "Easter Jet": {
+                  "color": "yellow",
+                  "index": 6,
+                  "text": "Korean LCC"
+                },
+                "Jeju Air": {
+                  "color": "yellow",
+                  "index": 3,
+                  "text": "Korean LCC"
+                },
+                "Jin Air": {
+                  "color": "yellow",
+                  "index": 4,
+                  "text": "Korean LCC"
                 },
                 "Korean Air": {
                   "color": "dark-blue",
-                  "index": 0
+                  "index": 0,
+                  "text": "Korean FCO"
+                },
+                "T'way Air": {
+                  "color": "yellow",
+                  "index": 5,
+                  "text": "Korean LCC"
                 }
               },
               "type": "value"
@@ -236,12 +439,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "semi-dark-purple",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 30
               }
             ]
           }
@@ -252,9 +451,10 @@
         "h": 7,
         "w": 11,
         "x": 12,
-        "y": 1
+        "y": 9
       },
       "id": 1,
+      "interval": "15s",
       "options": {
         "basemap": {
           "config": {},
@@ -279,7 +479,7 @@
                   "field": "airline",
                   "fixed": "dark-green"
                 },
-                "opacity": 0.5,
+                "opacity": 0.6,
                 "rotation": {
                   "fixed": 0,
                   "max": 360,
@@ -313,9 +513,16 @@
               "longitude": "lon",
               "mode": "coords"
             },
-            "name": "Layer 1",
+            "name": "airline",
             "tooltip": true,
             "type": "markers"
+          },
+          {
+            "layer-tooltip": false,
+            "name": "map",
+            "opacity": 0.3,
+            "tooltip": true,
+            "type": "osm-standard"
           }
         ],
         "tooltip": {
@@ -325,12 +532,12 @@
           "allLayers": false,
           "id": "coords",
           "lastOnly": false,
-          "lat": 35.366855,
+          "lat": 35.169233,
           "layer": "Layer 1",
-          "lon": 127.572404,
+          "lon": 127.929696,
           "noRepeat": false,
           "shared": false,
-          "zoom": 5.79
+          "zoom": 5.49
         }
       },
       "pluginVersion": "12.3.1",
@@ -341,10 +548,28 @@
             "type": "grafana-postgresql-datasource",
             "uid": "skywatcher-db"
           },
-          "editorMode": "builder",
+          "editorMode": "code",
           "format": "table",
-          "rawSql": "",
-          "refId": "A"
+          "rawQuery": true,
+          "rawSql": "SELECT\n  updated_at as \"time\",\n  callsign,\n  airline,\n  lat,\n  lon,\n  velocity,\n  altitude\nFROM active_flights\nWHERE lat IS NOT NULL AND lon IS NOT NULL AND $__timeFilter(updated_at)",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
         },
         {
           "dataset": "skywatcher",
@@ -377,7 +602,7 @@
           }
         }
       ],
-      "timeFrom": "30m",
+      "timeFrom": "15m",
       "title": "항공사별 geomap",
       "type": "geomap"
     },
@@ -387,7 +612,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 5,
       "panels": [],
@@ -459,7 +684,7 @@
         "h": 7,
         "w": 11,
         "x": 1,
-        "y": 9
+        "y": 17
       },
       "id": 3,
       "options": {
@@ -571,7 +796,7 @@
         "h": 7,
         "w": 11,
         "x": 12,
-        "y": 9
+        "y": 17
       },
       "id": 4,
       "options": {
@@ -617,19 +842,199 @@
       ],
       "title": "avg altitude",
       "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 7,
+      "panels": [],
+      "title": "flight logs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "skywatcher-db"
+      },
+      "description": "airflow DAG 2가 제대로 작동되는지 확인하기 위함",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 25
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "dataset": "skywatcher",
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n    -- 'hour'를 'minute'으로 바꾸면 분 단위로도 볼 수 있어\n    date_trunc('hour', created_at) as \"시간\", \n    COUNT(*) as \"데이터 수\"\nFROM flight_logs\nGROUP BY 1\nORDER BY 1 DESC;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "flight logs",
+      "type": "timeseries"
     }
   ],
   "preload": false,
   "schemaVersion": 42,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "Aero K",
+          "value": "Aero K"
+        },
+        "definition": "SELECT DISTINCT airline FROM flight_logs ORDER BY 1",
+        "description": "",
+        "includeAll": true,
+        "label": "airline",
+        "multi": true,
+        "name": "airline",
+        "options": [],
+        "query": "SELECT DISTINCT airline FROM flight_logs ORDER BY 1",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "KAL2928"
+          ],
+          "value": [
+            "KAL2928"
+          ]
+        },
+        "definition": "SELECT DISTINCT callsign \nFROM flight_logs \nWHERE airline IN (${airline:sqlstring}) \nORDER BY 1",
+        "description": "",
+        "includeAll": true,
+        "label": "callsign",
+        "multi": true,
+        "name": "callsign",
+        "options": [],
+        "query": "SELECT DISTINCT callsign \nFROM flight_logs \nWHERE airline IN (${airline:sqlstring}) \nORDER BY 1",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "15s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
   "timezone": "browser",
   "title": "skywatcher",
   "uid": "skywatcher-db",
