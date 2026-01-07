@@ -479,7 +479,7 @@
                   "field": "airline",
                   "fixed": "dark-green"
                 },
-                "opacity": 0.6,
+                "opacity": 0.8,
                 "rotation": {
                   "fixed": 0,
                   "max": 360,
@@ -492,7 +492,7 @@
                   "min": 2
                 },
                 "symbol": {
-                  "fixed": "img/icons/marker/circle.svg",
+                  "fixed": "img/icons/marker/plane.svg",
                   "mode": "fixed"
                 },
                 "symbolAlign": {
